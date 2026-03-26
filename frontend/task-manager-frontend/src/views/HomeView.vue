@@ -1,45 +1,13 @@
 <script setup lang="ts">
-import { ref, onMounted } from "vue";
+import { onMounted } from "vue";
+import { useTaskStore } from "@/stores/taskStore";
 
 import TaskInput from "@/components/molecules/TaskInput.vue";
 import TaskList from "@/components/organisms/TaskList.vue";
 
-import {
-  getTasks,
-  createTask,
-  deleteTask,
-  toggleTask,
-} from "@/services/taskService";
+const store = useTaskStore();
 
-const tasks = ref<any[]>([]);
-const isLoading = ref(false);
-
-async function loadTasks() {
-  tasks.value = await getTasks();
-}
-
-async function addTask(title: string) {
-  if(!title) return;
-
-  isLoading.value = true;
-
-  await createTask(title);
-  await loadTasks();
-
-  isLoading.value = false;
-}
-
-async function removeTask(id: number) {
-  await deleteTask(id);
-  await loadTasks();
-}
-
-async function toggle(id: number) {
-  await toggleTask(id);
-  await loadTasks();
-}
-
-onMounted(loadTasks);
+onMounted(store.fetchTasks);
 </script>
 
 <template>
@@ -50,15 +18,20 @@ onMounted(loadTasks);
         Task Manager
       </h1>
 
-      <TaskInput @add="addTask" :loading="isLoading" />
-      <p v-if="tasks.length === 0" class="text-center text-gray-400">
-  Nenhuma tarefa ainda 
-</p>
-      <TaskList
-        :tasks="tasks"
-        @toggle="toggle"
-        @delete="removeTask"
+      <TaskInput
+        @add="store.addTask"
+        :loading="store.isLoading"
       />
+
+      <TaskList
+        :tasks="store.tasks"
+        @toggle="store.toggle"
+        @delete="store.removeTask"
+      />
+
+      <p v-if="store.tasks.length === 0" class="text-center text-gray-400 mt-4">
+        Nenhuma tarefa ainda!!
+      </p>
 
     </div>
   </div>
