@@ -1,6 +1,9 @@
 <script setup lang="ts">
 import { ref, onMounted } from "vue";
 
+import TaskInput from "@/components/molecules/TaskInput.vue";
+import TaskList from "@/components/organisms/TaskList.vue";
+
 import {
   getTasks,
   createTask,
@@ -9,18 +12,13 @@ import {
 } from "@/services/taskService";
 
 const tasks = ref<any[]>([]);
-const newTask = ref("");
 
 async function loadTasks() {
   tasks.value = await getTasks();
 }
 
-async function addTask() {
-  if (!newTask.value) return;
-
-  await createTask(newTask.value);
-  newTask.value = "";
-
+async function addTask(title: string) {
+  await createTask(title);
   await loadTasks();
 }
 
@@ -38,23 +36,21 @@ onMounted(loadTasks);
 </script>
 
 <template>
-  <div>
-    <h1>Task Manager</h1>
+  <div class="min-h-screen bg-gray-100 flex items-center justify-center">
+    <div class="bg-white shadow-lg rounded-2xl p-6 w-full max-w-md">
 
-    <input v-model="newTask" placeholder="Nova tarefa" />
-    <button @click="addTask">Adicionar</button>
+      <h1 class="text-2xl font-bold mb-4 text-center">
+        Task Manager
+      </h1>
 
-    <ul>
-      <li v-for="task in tasks" :key="task.id">
-        <span
-          @click="toggle(task.id)"
-          :style="{ textDecoration: task.completed ? 'line-through' : 'none' }"
-        >
-          {{ task.title }}
-        </span>
+      <TaskInput @add="addTask" />
 
-        <button @click="removeTask(task.id)">X</button>
-      </li>
-    </ul>
+      <TaskList
+        :tasks="tasks"
+        @toggle="toggle"
+        @delete="removeTask"
+      />
+
+    </div>
   </div>
 </template>
