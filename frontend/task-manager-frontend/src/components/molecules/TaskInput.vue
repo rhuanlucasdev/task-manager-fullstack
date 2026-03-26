@@ -3,6 +3,10 @@ import { ref } from "vue";
 import BaseInput from "@/components/atoms/BaseInput.vue";
 import BaseButton from "@/components/atoms/BaseButton.vue";
 
+defineProps<{
+  loading?: boolean;
+}>();
+
 const emit = defineEmits(["add"]);
 
 const newTask = ref("");
@@ -13,10 +17,6 @@ function handleAdd() {
   emit("add", newTask.value);
   newTask.value = "";
 }
-
-defineProps<{
-  loading?: boolean;
-}>();
 </script>
 
 <template>
@@ -27,7 +27,11 @@ defineProps<{
       @enter="handleAdd"
     />
 
-    <BaseButton variant="primary" @click="handleAdd" :disabled="loading">
+    <BaseButton
+      variant="primary"
+      @click="handleAdd"
+      :disabled="loading"
+    >
       {{ loading ? "..." : "+" }}
     </BaseButton>
   </div>

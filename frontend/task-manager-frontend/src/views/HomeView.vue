@@ -25,13 +25,18 @@ onMounted(store.fetchTasks);
 
       <TaskList
         :tasks="store.tasks"
+        :loadingIds="store.loadingIds"
         @toggle="store.toggle"
         @delete="store.removeTask"
       />
 
-      <p v-if="store.tasks.length === 0" class="text-center text-gray-400 mt-4">
-        Nenhuma tarefa ainda!!
-      </p>
+      <div
+        v-if="store.tasks.length === 0"
+        class="text-center text-gray-400 mt-6"
+      >
+        <p class="text-lg">Nada por aqui ainda 👀</p>
+        <p class="text-sm">Adicione sua primeira tarefa</p>
+      </div>
 
     </div>
   </div>

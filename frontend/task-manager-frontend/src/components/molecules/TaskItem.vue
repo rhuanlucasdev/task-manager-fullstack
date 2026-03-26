@@ -5,6 +5,7 @@ defineProps<{
     title: string;
     completed: boolean;
   };
+  loading?: boolean;
 }>();
 
 const emit = defineEmits(["toggle", "delete"]);
@@ -12,21 +13,25 @@ const emit = defineEmits(["toggle", "delete"]);
 
 <template>
   <li
-    class="flex justify-between items-center bg-gray-50 p-2 rounded-lg"
+    class="flex justify-between items-center bg-gray-50 p-3 rounded-lg transition hover:shadow-md"
   >
     <span
-      @click="emit('toggle', task.id)"
-      class="cursor-pointer"
-      :class="{ 'line-through text-gray-400': task.completed }"
+      @click="!loading && emit('toggle', task.id)"
+      class="cursor-pointer transition"
+      :class="{
+        'line-through text-gray-400': task.completed,
+        'opacity-50': loading
+      }"
     >
       {{ task.title }}
     </span>
 
     <button
       @click="emit('delete', task.id)"
-      class="text-red-500"
+      :disabled="loading"
+      class="text-red-500 transition hover:scale-110 disabled:opacity-30"
     >
-      ✕
+      {{ loading ? "..." : "✕" }}
     </button>
   </li>
 </template>
