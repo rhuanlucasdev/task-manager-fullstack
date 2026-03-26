@@ -13,6 +13,10 @@ function handleAdd() {
   emit("add", newTask.value);
   newTask.value = "";
 }
+
+defineProps<{
+  loading?: boolean;
+}>();
 </script>
 
 <template>
@@ -20,10 +24,11 @@ function handleAdd() {
     <BaseInput
       v-model="newTask"
       placeholder="Nova tarefa"
+      @enter="handleAdd"
     />
 
-    <BaseButton variant="primary" @click="handleAdd">
-      +
+    <BaseButton variant="primary" @click="handleAdd" :disabled="loading">
+      {{ loading ? "..." : "+" }}
     </BaseButton>
   </div>
 </template>

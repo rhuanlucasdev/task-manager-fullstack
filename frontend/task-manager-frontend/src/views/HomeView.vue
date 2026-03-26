@@ -12,14 +12,21 @@ import {
 } from "@/services/taskService";
 
 const tasks = ref<any[]>([]);
+const isLoading = ref(false);
 
 async function loadTasks() {
   tasks.value = await getTasks();
 }
 
 async function addTask(title: string) {
+  if(!title) return;
+
+  isLoading.value = true;
+
   await createTask(title);
   await loadTasks();
+
+  isLoading.value = false;
 }
 
 async function removeTask(id: number) {
@@ -43,8 +50,10 @@ onMounted(loadTasks);
         Task Manager
       </h1>
 
-      <TaskInput @add="addTask" />
-
+      <TaskInput @add="addTask" :loading="isLoading" />
+      <p v-if="tasks.length === 0" class="text-center text-gray-400">
+  Nenhuma tarefa ainda 
+</p>
       <TaskList
         :tasks="tasks"
         @toggle="toggle"

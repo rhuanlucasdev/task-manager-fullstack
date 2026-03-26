@@ -4,7 +4,7 @@ defineProps<{
   placeholder?: string;
 }>();
 
-const emit = defineEmits(["update:modelValue"]);
+const emit = defineEmits(["update:modelValue", "enter"]);
 </script>
 
 <template>
@@ -12,6 +12,7 @@ const emit = defineEmits(["update:modelValue"]);
     :value="modelValue"
     :placeholder="placeholder"
     @input="emit('update:modelValue', ($event.target as HTMLInputElement).value)"
+    @keyup.enter="$emit('enter')"
     class="border rounded-lg px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-green-400"
   />
 </template>
