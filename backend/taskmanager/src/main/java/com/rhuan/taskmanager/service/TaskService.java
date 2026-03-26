@@ -1,101 +1,73 @@
 package com.rhuan.taskmanager.service;
 
-// Entidade (modelo de dados)
+import com.rhuan.taskmanager.dto.TaskDTO;
 import com.rhuan.taskmanager.domain.Task;
-
-// Repository (acesso ao banco)
 import com.rhuan.taskmanager.repository.TaskRepository;
-
-// Annotation que marca essa classe como um "Service" gerenciado pelo Spring
 import org.springframework.stereotype.Service;
 
-// API moderna de datas
-import java.time.LocalDateTime;
-
-// Lista tipada do Java
 import java.util.List;
 
 /**
- * Camada de serviço responsável pela lógica de negócio.
- * 
- * Aqui é onde decidimos COMO a aplicação funciona,
- * e NÃO apenas acessar o banco.
+ * Camada de negócio (Service)
  */
 @Service
 public class TaskService {
 
-    /**
-     * Dependência do repository.
-     * 
-     * Usamos "final" porque essa dependência não deve mudar.
-     */
-    private final TaskRepository taskRepository;
+    private final TaskRepository repository;
 
-    /**
-     * Construtor usado pelo Spring para injeção de dependência.
-     * 
-     * O Spring automaticamente fornece uma instância de TaskRepository.
-     */
-    public TaskService(TaskRepository taskRepository) {
-        this.taskRepository = taskRepository;
+    public TaskService(TaskRepository repository) {
+        this.repository = repository;
     }
 
     /**
-     * Cria uma nova tarefa.
-     * 
-     * @param title título da tarefa
-     * @return tarefa salva no banco
+     * Converte Entity → DTO
      */
-    public Task createTask(String title) {
+    private TaskDTO toDTO(Task task) {
+        return new TaskDTO(
+                task.getId(),
+                task.getTitle(),
+                task.isCompleted());
+    }
 
-        // Criamos uma nova instância da entidade
+    /**
+     * Busca todas tarefas
+     */
+    public List<TaskDTO> getAllTasks() {
+        return repository.findAll()
+                .stream()
+                .map(this::toDTO)
+                .toList();
+    }
+
+    /**
+     * Cria tarefa
+     */
+    public TaskDTO createTask(String title) {
         Task task = new Task();
-
-        // Definimos os valores iniciais
         task.setTitle(title);
-
-        // Toda nova tarefa começa como não concluída
         task.setCompleted(false);
 
-        // Define a data de criação como agora
-        task.setCreatedAt(LocalDateTime.now());
+        Task saved = repository.save(task);
 
-        // Salva no banco e retorna a entidade persistida
-        return taskRepository.save(task);
+        return toDTO(saved);
     }
 
     /**
-     * Retorna todas as tarefas do banco.
-     */
-    public List<Task> getAllTasks() {
-        return taskRepository.findAll();
-    }
-
-    /**
-     * Deleta uma tarefa pelo ID.
+     * Remove tarefa
      */
     public void deleteTask(Long id) {
-        taskRepository.deleteById(id);
+        repository.deleteById(id);
     }
 
     /**
-     * Alterna o status de uma tarefa (concluída ↔ não concluída).
-     * 
-     * @param id identificador da tarefa
-     * @return tarefa atualizada
+     * Alterna status
      */
-    public Task toggleTask(Long id) {
+    public TaskDTO toggleTask(Long id) {
+        Task task = repository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Task não encontrada"));
 
-        // Busca a tarefa pelo ID
-        Task task = taskRepository.findById(id)
-
-                // Se não encontrar, lança erro
-                .orElseThrow(() -> new RuntimeException("Task not found"));
-
-        // Inverte o valor atual (true vira false, false vira true)
         task.setCompleted(!task.isCompleted());
 
-        // Salva novamente no banco (update)
-        return taskRepository.save(task);
+        return toDTO(repository.save(task));
     }
 }

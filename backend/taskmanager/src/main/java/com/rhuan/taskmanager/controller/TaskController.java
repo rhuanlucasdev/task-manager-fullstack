@@ -1,69 +1,55 @@
 package com.rhuan.taskmanager.controller;
 
-import com.rhuan.taskmanager.domain.Task;
+import com.rhuan.taskmanager.dto.CreateTaskDTO;
+import com.rhuan.taskmanager.dto.TaskDTO;
 import com.rhuan.taskmanager.service.TaskService;
-
+import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 /**
- * Controller responsável por expor a API REST de tarefas.
- * 
- * Aqui lidamos com requisições HTTP (entrada/saída),
- * NÃO com regra de negócio.
+ * Controller REST
  */
 @RestController
 @RequestMapping("/tasks")
 public class TaskController {
 
-    /**
-     * Dependência do service (regra de negócio).
-     */
-    private final TaskService taskService;
+    private final TaskService service;
 
-    /**
-     * Injeção de dependência via construtor.
-     */
-    public TaskController(TaskService taskService) {
-        this.taskService = taskService;
+    public TaskController(TaskService service) {
+        this.service = service;
     }
 
     /**
      * GET /tasks
-     * Retorna todas as tarefas.
      */
     @GetMapping
-    public List<Task> getAllTasks() {
-        return taskService.getAllTasks();
+    public List<TaskDTO> getAll() {
+        return service.getAllTasks();
     }
 
     /**
      * POST /tasks
-     * Cria uma nova tarefa.
-     * 
-     * @RequestBody → converte JSON em objeto Java
      */
     @PostMapping
-    public Task createTask(@RequestBody Task task) {
-        return taskService.createTask(task.getTitle());
+    public TaskDTO create(@Valid @RequestBody CreateTaskDTO dto) {
+        return service.createTask(dto.getTitle());
     }
 
     /**
      * DELETE /tasks/{id}
-     * Remove uma tarefa pelo ID.
      */
     @DeleteMapping("/{id}")
-    public void deleteTask(@PathVariable Long id) {
-        taskService.deleteTask(id);
+    public void delete(@PathVariable Long id) {
+        service.deleteTask(id);
     }
 
     /**
      * PATCH /tasks/{id}
-     * Alterna o status da tarefa.
      */
     @PatchMapping("/{id}")
-    public Task toggleTask(@PathVariable Long id) {
-        return taskService.toggleTask(id);
+    public TaskDTO toggle(@PathVariable Long id) {
+        return service.toggleTask(id);
     }
 }
