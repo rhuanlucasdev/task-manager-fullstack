@@ -1,5 +1,7 @@
 <script setup lang="ts">
 import { ref } from "vue";
+import BaseInput from "@/components/atoms/BaseInput.vue";
+import BaseButton from "@/components/atoms/BaseButton.vue";
 
 const emit = defineEmits(["add"]);
 
@@ -15,16 +17,13 @@ function handleAdd() {
 
 <template>
   <div class="flex gap-2 mb-4">
-    <input
+    <BaseInput
       v-model="newTask"
       placeholder="Nova tarefa"
-      class="flex-1 border rounded-lg px-3 py-2"
     />
-    <button
-      @click="handleAdd"
-      class="bg-green-500 text-white px-4 py-2 rounded-lg"
-    >
+
+    <BaseButton variant="primary" @click="handleAdd">
       +
-    </button>
+    </BaseButton>
   </div>
 </template>
